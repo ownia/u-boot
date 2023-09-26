@@ -5,6 +5,7 @@
 
 #include <common.h>
 #include <dm.h>
+#include <efi_loader.h>
 #include <init.h>
 #include <log.h>
 #include <syscon.h>
@@ -15,11 +16,20 @@
 #include <asm/arch-rockchip/hardware.h>
 #include <asm/arch-rockchip/misc.h>
 
-#include <dfu.h>
-#include <env.h>
-
 #define GRF_IO_VSEL_BT565_SHIFT 0
 #define GRF_IO_VSEL_ADDR  0xff77e640
+
+#define TOYBRICK_UPDATABLE_IMAGES	2
+
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+static struct efi_fw_image fw_images[TOYBRICK_UPDATABLE_IMAGES] = {0};
+
+struct efi_capsule_update_info update_info = {
+	.images = fw_images,
+};
+
+u8 num_image_type_guids = TOYBRICK_UPDATABLE_IMAGES;
+#endif
 
 int board_early_init_f(void)
 {
@@ -29,26 +39,19 @@ int board_early_init_f(void)
 	return 0;
 }
 
-/* ALT_INFO Macro Function below added for DFU_ALT_INFO */
-#ifdef CONFIG_SET_DFU_ALT_INFO
-#define CONFIG_DFU_ALT_BOOT_SD \
-	"mmc 1=idbloader-img raw 0x40 0x2000;u-boot-itb raw 0x4000 0x2000\0"
-#define CONFIG_DFU_ALT_BOOT_EMMC \
-	"mmc 0=idbloader-img raw 0x40 0x2000;u-boot-itb raw 0x4000 0x2000\0"
-
-void set_dfu_alt_info(char *interface, char *devstr)
+#ifndef CONFIG_SPL_BUILD
+#if defined(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) && defined(CONFIG_EFI_PARTITION)
+void rockchip_capsule_update_board_setup(void)
 {
-	char *alt_info;
-	struct mmc *mmc;
-	int dev_num = 0;
-	alt_info = env_get("dfu_alt_info");
-	if (alt_info)
-		return;
-	dev_num = simple_strtoul(devstr ? devstr:"0", NULL, 10);
-	mmc = find_mmc_device(dev_num);
-	if (!mmc || mmc_init(mmc))
-		return;
-	alt_info = IS_SD(mmc) ? CONFIG_DFU_ALT_BOOT_SD : CONFIG_DFU_ALT_BOOT_EMMC;
-	env_set("dfu_alt_info", alt_info);
+	efi_guid_t idbldr_image_type_guid =
+		ROCKPI_4B_IDBLOADER_IMAGE_GUID;
+	efi_guid_t uboot_image_type_guid = ROCKPI_4B_UBOOT_IMAGE_GUID;
+
+	guidcpy(&fw_images[0].image_type_id, &idbldr_image_type_guid);
+	guidcpy(&fw_images[1].image_type_id, &uboot_image_type_guid);
+
+	fw_images[0].fw_name = u"TOYBRICK-IDBLOADER";
+	fw_images[1].fw_name = u"TOYBRICK-UBOOT";
 }
-#endif
+#endif /* CONFIG_EFI_HAVE_CAPSULE_SUPPORT && CONFIG_EFI_PARTITION */
+#endif /* !CONFIG_SPL_BUILD */
