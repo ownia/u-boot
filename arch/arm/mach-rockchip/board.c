@@ -17,12 +17,14 @@
 #include <uuid.h>
 #include <asm/cache.h>
 #include <asm/global_data.h>
+#include <asm/gpio.h>
 #include <asm/io.h>
 #include <asm/arch-rockchip/boot_mode.h>
 #include <asm/arch-rockchip/clock.h>
 #include <asm/arch-rockchip/periph.h>
 #include <asm/arch-rockchip/misc.h>
 #include <power/regulator.h>
+#include <linux/delay.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -187,6 +189,9 @@ int board_late_init(void)
 	return rk_board_late_init();
 }
 
+#define GPIO_HUB_RESET 149
+#define GPIO_HOST_EN 66
+
 int board_init(void)
 {
 	int ret;
@@ -196,6 +201,21 @@ int board_init(void)
 	if (ret)
 		debug("%s: Cannot enable boot on regulator\n", __func__);
 #endif
+
+	ret = gpio_request(GPIO_HOST_EN, "gpio_host_enable");
+	if (ret < 0) {
+		printf("request for gpio_host_enable failed:%d\n", ret);
+		return 0;
+	}
+	gpio_direction_output(GPIO_HOST_EN, 1);
+	ret = gpio_request(GPIO_HUB_RESET, "gpio_hub");
+	if (ret < 0) {
+		printf("request for gpio_hubrest failed:%d\n", ret);
+		return 0;
+	}
+	gpio_set_value(GPIO_HUB_RESET, 0);
+	mdelay(30);
+	gpio_direction_output(GPIO_HUB_RESET, 1);
 
 	return 0;
 }

@@ -32,6 +32,13 @@ config TARGET_EVB_RK3399
 	  with full function and physical connectors support like Type-C ports,
 	  USB.0 host ports, LVDS, JTAG, MAC, SD card, HDMI, USB-to-serial...
 
+config TARGET_TOYBRICK_RK3399
+	bool "RK3399 TOYBRICK board"
+	help
+	  RK3399 toybrick is a evaluation board for Rockchip RK3399,
+	  with full function and physical connectors support like Type-C ports,
+	  USB.0 host ports, LVDS, JTAG, MAC, SD card, HDMI, USB-to-serial...
+
 config TARGET_PINEBOOK_PRO_RK3399
 	bool "Pinebook Pro"
 	help
@@ -175,6 +182,7 @@ source "board/pine64/pinebook-pro-rk3399/Kconfig"
 source "board/pine64/pinephone-pro-rk3399/Kconfig"
 source "board/pine64/rockpro64_rk3399/Kconfig"
 source "board/rockchip/evb_rk3399/Kconfig"
+source "board/rockchip/toybrick_rk3399/Kconfig"
 source "board/theobroma-systems/puma_rk3399/Kconfig"
 source "board/vamrs/rock960_rk3399/Kconfig"
 
