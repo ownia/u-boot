@@ -1,0 +1,41 @@
+name: Sandbox test
+
+on: [push, pull_request]
+
+jobs:
+  build_image:
+    name: Sandbox test
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        env:
+        - ARCH: x86_64
+    steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - name: Start testing
+      run:
+        sudo apt-get install bc bison build-essential cgpt coccinelle
+          device-tree-compiler dfu-util efitools flex gdisk graphviz imagemagick
+          liblz4-tool libgnutls28-dev libguestfs-tools libncurses-dev
+          libpython3-dev libsdl2-dev libssl-dev lz4 lzma lzma-alone openssl
+          pkg-config python3 python3-asteval python3-coverage python3-filelock
+          python3-pkg-resources python3-pycryptodome python3-pyelftools
+          python3-pytest python3-pytest-xdist python3-sphinxcontrib.apidoc
+          python3-sphinx-rtd-theme python3-subunit python3-testtools
+          python3-virtualenv swig u-boot-tools uuid-dev vboot-kernel-utils;
+        sudo chmod a+r /boot/vmlinuz-*;
+        virtualenv -p /usr/bin/python3 venv;
+        . ./venv/bin/activate;
+        pip3 install -r test/py/requirements.txt;
+        export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1;
+        ./test/py/test.py --bd sandbox --build;
