@@ -7,7 +7,8 @@
 #ifndef __extlinux_h
 #define __extlinux_h
 
-#define EXTLINUX_FNAME	"extlinux/extlinux.conf"
+/* modified for TB-RK3568X */
+#define EXTLINUX_FNAME	"extlinux/extlinux.conf.TX030C"
 
 /**
  * struct extlinux_info - useful information for extlinux_getfile()
