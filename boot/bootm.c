@@ -68,6 +68,11 @@ static void boot_start_lmb(struct bootm_headers *images)
 static inline void boot_start_lmb(struct bootm_headers *images) { }
 #endif
 
+__weak int bootm_board_start(void)
+{
+	return 0;
+}
+
 static int bootm_start(struct cmd_tbl *cmdtp, int flag, int argc,
 		       char *const argv[])
 {
@@ -79,7 +84,7 @@ static int bootm_start(struct cmd_tbl *cmdtp, int flag, int argc,
 	bootstage_mark_name(BOOTSTAGE_ID_BOOTM_START, "bootm_start");
 	images.state = BOOTM_STATE_START;
 
-	return 0;
+	return bootm_board_start();
 }
 
 static ulong bootm_data_addr(int argc, char *const argv[])

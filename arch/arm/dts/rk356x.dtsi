@@ -509,6 +509,15 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 
+			/* These power domains are grouped by VD_NPU */
+			power-domain@RK3568_PD_NPU {
+				reg = <RK3568_PD_NPU>;
+				clocks = <&cru ACLK_NPU_PRE>,
+					 <&cru HCLK_NPU_PRE>,
+					 <&cru PCLK_NPU_PRE>;
+				pm_qos = <&qos_npu>;
+			};
+
 			/* These power domains are grouped by VD_GPU */
 			power-domain@RK3568_PD_GPU {
 				reg = <RK3568_PD_GPU>;

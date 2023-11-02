@@ -1,2 +1,8 @@
 make toybrick-rk3568_defconfig
+
+# Build U-Boot using mainline BL31
 make CROSS_COMPILE=aarch64-linux-gnu- BL31=/home/weiouy01/code/rk3568/trusted-firmware-a/build/rk3568/debug/bl31/bl31.elf ROCKCHIP_TPL=/home/weiouy01/code/rk3568/rkbin/bin/rk35/rk3568_ddr_1560MHz_v1.18.bin -j4
+
+# Build U-Boot using rkbin prebuilt BL31
+# arm-scmi firmware:scmi: unable to communicate with SCMI(-95)
+make CROSS_COMPILE=aarch64-linux-gnu- BL31=/home/weiouy01/code/toybrick/rkbin/bin/rk35/rk3568_bl31_v1.32.elf ROCKCHIP_TPL=/home/weiouy01/code/rk3568/rkbin/bin/rk35/rk3568_ddr_1560MHz_v1.18.bin -j4
