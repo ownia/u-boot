@@ -134,6 +134,7 @@ dtb-$(CONFIG_ROCKCHIP_RK3368) += \
 
 dtb-$(CONFIG_ROCKCHIP_RK3399) += \
 	rk3399-evb.dtb \
+	rk3399-toybrick-prod.dtb \
 	rk3399-ficus.dtb \
 	rk3399-firefly.dtb \
 	rk3399-gru-bob.dtb \

@@ -731,7 +731,8 @@ static efi_status_t find_boot_device(void)
 		ret = get_dp_device(boot_var16, &boot_dev);
 		if (ret == EFI_SUCCESS) {
 			if (device_is_present_and_system_part(boot_dev)) {
-				goto found;
+			bootdev_root = efi_file_from_path(boot_dev);
+		goto found;
 			} else {
 				efi_free_pool(boot_dev);
 				boot_dev = NULL;
@@ -769,7 +770,8 @@ skip:
 			continue;
 
 		if (device_is_present_and_system_part(boot_dev))
-			break;
+		bootdev_root = efi_file_from_path(boot_dev);
+	break;
 
 		efi_free_pool(boot_dev);
 		boot_dev = NULL;

@@ -65,6 +65,7 @@
 	ENV_MEM_LAYOUT_SETTINGS \
 	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"partitions=" PARTS_DEFAULT \
+	"dfu_alt_info=" "mmc 0=idbloader.img part 1 1;u-boot.itb part 1 4\0" \
 	ROCKCHIP_DEVICE_SETTINGS \
 	BOOTENV \
 	BOOTENV_SF \
