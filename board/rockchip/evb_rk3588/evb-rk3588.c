@@ -24,8 +24,6 @@ void rockchip_capsule_update_board_setup(void)
 
 	guidcpy(&fw_images[0].image_type_id, &uboot_image_type_guid);
 	fw_images[0].fw_name = u"ROCKCHIP_UBOOT";
-
-	env_set("boot_targets", "usb");
 }
 #endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
