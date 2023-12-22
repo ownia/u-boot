@@ -11,4 +11,6 @@ int rockchip_cpuid_from_efuse(const u32 cpuid_offset,
 			      u8 *cpuid);
 int rockchip_cpuid_set(const u8 *cpuid, const u32 cpuid_length);
 int rockchip_setup_macaddr(void);
+#ifdef CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT
 void rockchip_capsule_update_board_setup(void);
+#endif

@@ -520,6 +520,12 @@ config ROCKCHIP_SPI_IMAGE
 config LNX_KRNL_IMG_TEXT_OFFSET_BASE
 	default TEXT_BASE
 
+config ROCKCHIP_EFI_CAPSULE_SUPPORT
+	bool "Rockchip efi capsule update vendor support"
+	default y if EFI_HAVE_CAPSULE_SUPPORT && EFI_PARTITION
+	help
+	  Rockchip implements a vendor capsule update mechanism.
+
 source "arch/arm/mach-rockchip/px30/Kconfig"
 source "arch/arm/mach-rockchip/rk3036/Kconfig"
 source "arch/arm/mach-rockchip/rk3066/Kconfig"

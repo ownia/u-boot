@@ -12,15 +12,19 @@
 #include <linux/kernel.h>
 #include <power/regulator.h>
 
-#define ROCKPI4_UPDATABLE_IMAGES	2
+#if defined(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) && defined(CONFIG_EFI_PARTITION)
 
-#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+#ifdef CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT
+
+#define ROCKPI4_UPDATABLE_IMAGES	2
 static struct efi_fw_image fw_images[ROCKPI4_UPDATABLE_IMAGES] = {0};
 
 struct efi_capsule_update_info update_info = {
 	.num_images = ROCKPI4_UPDATABLE_IMAGES,
 	.images = fw_images,
 };
+
+#endif /* CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT */
 
 #endif
 
@@ -44,7 +48,7 @@ out:
 	return 0;
 }
 
-#if defined(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) && defined(CONFIG_EFI_PARTITION)
+#ifdef CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT
 static bool board_is_rockpi_4b(void)
 {
 	return CONFIG_IS_ENABLED(TARGET_EVB_RK3399) &&
@@ -81,5 +85,5 @@ void rockchip_capsule_update_board_setup(void)
 		fw_images[1].fw_name = u"ROCKPI4C-UBOOT";
 	}
 }
-#endif /* CONFIG_EFI_HAVE_CAPSULE_SUPPORT && CONFIG_EFI_PARTITION */
+#endif /* CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT */
 #endif /* !CONFIG_SPL_BUILD */

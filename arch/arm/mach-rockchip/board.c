@@ -26,7 +26,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if defined(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) && defined(CONFIG_EFI_PARTITION)
+#ifdef CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT
 
 #define DFU_ALT_BUF_LEN			SZ_1K
 
@@ -169,11 +169,11 @@ static void gpt_capsule_update_setup(void)
 		}
 	}
 }
-#endif /* CONFIG_EFI_HAVE_CAPSULE_SUPPORT && CONFIG_EFI_PARTITION */
+#endif /* CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT */
 
 __weak int rk_board_late_init(void)
 {
-#if defined(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) && defined(CONFIG_EFI_PARTITION)
+#ifdef CONFIG_ROCKCHIP_EFI_CAPSULE_SUPPORT
 	gpt_capsule_update_setup();
 #endif
 
