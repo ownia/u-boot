@@ -11,6 +11,10 @@
 	};
 };
 
+&rng {
+	status = "okay";
+};
+
 /*
 &sdhci {
 	cap-mmc-highspeed;
