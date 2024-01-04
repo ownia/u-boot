@@ -7,6 +7,7 @@
 #include <common.h>
 #include <command.h>
 #include <dm.h>
+#include <dm/uclass-internal.h>
 #include <hexdump.h>
 #include <malloc.h>
 #include <rng.h>
@@ -18,6 +19,23 @@ static int do_rng(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 	int devnum;
 	struct udevice *dev;
 	int ret = CMD_RET_SUCCESS;
+
+	int idx;
+
+	if (argc == 2 && !strcmp(argv[1], "list")) {
+		struct uclass *uc;
+
+		idx = 0;
+		uclass_id_foreach_dev(UCLASS_RNG, dev, uc) {
+			printf("RNG #%d - %s\n", idx++, dev->name);
+		}
+
+		if (!idx) {
+			printf("*** no RNG devices available ***\n");
+			return CMD_RET_FAILURE;
+		}
+		return CMD_RET_SUCCESS;
+	}
 
 	switch (argc) {
 	case 1:
