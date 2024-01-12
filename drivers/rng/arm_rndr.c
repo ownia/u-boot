@@ -76,3 +76,7 @@ U_BOOT_DRIVER(arm_rndr) = {
 	.ops = &arm_rndr_ops,
 	.probe = arm_rndr_probe,
 };
+
+U_BOOT_DRVINFO(cpu_arm_rndr) = {
+	.name = DRIVER_NAME,
+};

@@ -135,7 +135,7 @@ static int bind_smccc_features(struct udevice *dev, int psci_method)
 	    PSCI_VERSION_MAJOR(psci_0_2_get_version()) == 0)
 		return 0;
 
-	if (request_psci_features(ARM_SMCCC_VERSION) ==
+	if (request_psci_features(ARM_SMCCC_ARCH_FEATURES) ==
 	    PSCI_RET_NOT_SUPPORTED)
 		return 0;
 
@@ -152,10 +152,8 @@ static int bind_smccc_features(struct udevice *dev, int psci_method)
 		struct udevice *dev2;
 		int ret;
 
-		if (!feature->is_supported || !feature->is_supported(pdata->invoke_fn)) {
-			pr_warn("%s was not supported\n", drv_name);
+		if (!feature->is_supported || !feature->is_supported(pdata->invoke_fn))
 			continue;
-		}
 
 		ret = device_bind_driver(dev, drv_name, drv_name, &dev2);
 		if (ret) {
