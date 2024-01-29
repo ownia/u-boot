@@ -15,6 +15,16 @@
 	model = "Rockchip RK3588 EVB1 V10 Board";
 	compatible = "rockchip,rk3588-evb1-v10", "rockchip,rk3588";
 
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		optee@8400000 {
+			reg = <0x0 0x8400000 0x0 0x1000000>;
+			no-map;
+		};
+	};
+
 	aliases {
 		mmc0 = &sdhci;
 		serial2 = &uart2;
