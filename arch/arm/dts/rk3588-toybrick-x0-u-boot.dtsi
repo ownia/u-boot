@@ -10,7 +10,3 @@
 		u-boot,spl-boot-order = "same-as-spl", &sdhci;
 	};
 };
-
-&rng {
-	status = "okay";
-};

@@ -16,7 +16,7 @@
 	};
 
 	dmc {
-		compatible = "rockchip,rk3588-dmc";
+		compatible = "u-boot,rockchip,rk3588-dmc";
 		bootph-all;
 		status = "okay";
 	};
