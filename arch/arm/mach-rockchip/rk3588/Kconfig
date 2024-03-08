@@ -138,6 +138,12 @@ config TARGET_TOYBRICK_RK3588
 	help
 	  Toybrick RK3588 is a Rockchip RK3588 based SBC.
 
+config TARGET_ARMSOM_RK3588
+	bool "ArmSoM RK3588 board"
+	select BOARD_LATE_INIT
+	help
+	  ArmSoM RK3588 is a Rockchip RK3588 based SBC.
+
 config ROCKCHIP_BOOT_MODE_REG
 	default 0xfd588080
 
@@ -157,5 +163,6 @@ source board/rockchip/evb_rk3588/Kconfig
 source board/radxa/rock5a-rk3588s/Kconfig
 source board/radxa/rock5b-rk3588/Kconfig
 source board/rockchip/toybrick_rk3588/Kconfig
+source board/rockchip/armsom_rk3588/Kconfig
 
 endif
