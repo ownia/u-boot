@@ -197,6 +197,10 @@ int board_init(void)
 		debug("%s: Cannot enable boot on regulator\n", __func__);
 #endif
 
+#ifdef CONFIG_PCI
+	pci_init();
+#endif
+
 	return 0;
 }
 
