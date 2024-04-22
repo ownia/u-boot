@@ -43,7 +43,7 @@ static struct ram_ops rk3588_dmc_ops = {
 };
 
 static const struct udevice_id rk3588_dmc_ids[] = {
-	{ .compatible = "rockchip,rk3588" },
+	{ .compatible = "rockchip,rk3588-dmc" },
 	{ }
 };
 
