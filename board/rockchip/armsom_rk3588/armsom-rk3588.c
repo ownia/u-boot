@@ -73,8 +73,36 @@ static int rk3588_add_reserved_memory_fdt_nodes(void *new_blob)
 					  NULL, flags);
 }
 
+static int configure_systemready_fdt_nodes(void *blob)
+{
+	const char *dmc_compatible = "rockchip,rk3588-dmc";
+	int off = fdt_node_offset_by_compatible(blob, -1, dmc_compatible);
+	int err = 0;
+
+	if (off < 0) {
+		printf("not find dmc node\n");
+		return off;
+	}
+
+	err = fdt_del_node(blob, off);
+	if (err < 0) {
+		printf("could not remove dmc\n");
+		return err;
+	}
+
+	return 0;
+}
+
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
-	return rk3588_add_reserved_memory_fdt_nodes(blob);
+	int ret = 0;
+
+	ret = rk3588_add_reserved_memory_fdt_nodes(blob);
+	if (ret)
+		return ret;
+
+	ret = configure_systemready_fdt_nodes(blob);
+
+	return ret;
 }
 #endif
