@@ -103,12 +103,6 @@ static efi_status_t EFIAPI efi_disconnect_controller(
 					efi_handle_t driver_image_handle,
 					efi_handle_t child_handle);
 
-static
-efi_status_t EFIAPI efi_connect_controller(efi_handle_t controller_handle,
-					   efi_handle_t *driver_image_handle,
-					   struct efi_device_path *remain_device_path,
-					   bool recursive);
-
 /* Called on every callback entry */
 int __efi_entry_check(void)
 {
@@ -3665,11 +3659,10 @@ static efi_status_t efi_connect_single_controller(
  *
  * Return: status code
  */
-static efi_status_t EFIAPI efi_connect_controller(
-			efi_handle_t controller_handle,
-			efi_handle_t *driver_image_handle,
-			struct efi_device_path *remain_device_path,
-			bool recursive)
+efi_status_t EFIAPI efi_connect_controller(efi_handle_t controller_handle,
+					   efi_handle_t *driver_image_handle,
+					   struct efi_device_path *remain_device_path,
+					   bool recursive)
 {
 	efi_status_t r;
 	efi_status_t ret = EFI_NOT_FOUND;
