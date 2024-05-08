@@ -913,6 +913,96 @@ static bool device_is_present_and_system_part(struct efi_device_path *dp)
 }
 
 /**
+ * get_esp_from_boot_option_file_path - get the expanded device path
+ *
+ * Get a possible efi system partition by expanding a boot option
+ * file path.
+ *
+ * @boot_dev	The device path pointing to a boot option
+ * Return:	The full ESP device path or NULL if fail
+ */
+static struct efi_device_path *get_esp_from_boot_option_file_path(struct efi_device_path *boot_dev)
+{
+	efi_status_t ret = EFI_SUCCESS;
+	efi_handle_t handle;
+	struct efi_device_path *temp_dp;
+	struct efi_block_io *block_io;
+	void *buffer;
+	efi_handle_t *simple_file_system_handle;
+	efi_uintn_t number_handles, index;
+	u32 size, temp_size;
+
+	temp_dp = boot_dev;
+
+	/*
+	 * for device path pointing to simple file system, it only expands to one
+	 * full path
+	 */
+	ret = EFI_CALL(efi_locate_device_path(&efi_simple_file_system_protocol_guid,
+					      &temp_dp,
+					      &handle));
+
+	if (ret != EFI_SUCCESS &&
+	    EFI_DP_TYPE(temp_dp, END, END) &&
+	    device_is_present_and_system_part(temp_dp))
+		return temp_dp;
+
+	/*
+	 * for device path only pointing to the removable device handle, try to
+	 * search all its children handles
+	 */
+	ret = EFI_CALL(efi_locate_device_path(&efi_block_io_guid, &temp_dp, &handle));
+	if (ret != EFI_SUCCESS)
+		return NULL;
+
+	EFI_CALL(efi_connect_controller(handle, NULL, NULL, true));
+
+	/* align with EDK II, issue a dummy read to the device to check the device change */
+	ret = EFI_CALL(efi_handle_protocol(handle, &efi_block_io_guid, (void **)&block_io));
+	if (ret != EFI_SUCCESS)
+		return NULL;
+
+	buffer = memalign(block_io->media->io_align, block_io->media->block_size);
+	if (!buffer)
+		return NULL;
+
+	ret = EFI_CALL(block_io->read_blocks(block_io,
+					     block_io->media->media_id,
+					     0,
+					     block_io->media->block_size,
+					     buffer));
+	free(buffer);
+	if (ret != EFI_SUCCESS)
+		return NULL;
+
+	/* detect the default boot file from removable media */
+	size = efi_dp_size(boot_dev) - sizeof(struct efi_device_path);
+	EFI_CALL(efi_locate_handle_buffer(BY_PROTOCOL,
+					  &efi_simple_file_system_protocol_guid,
+					  NULL,
+					  &number_handles,
+					  &simple_file_system_handle));
+	for (index = 0; index < number_handles; index++) {
+		EFI_CALL(efi_handle_protocol(simple_file_system_handle[index],
+					     &efi_guid_device_path,
+					     (void **)&temp_dp));
+		log_debug("Search ESP %pD\n", temp_dp);
+		temp_size = efi_dp_size(temp_dp) - sizeof(struct efi_device_path);
+		if (size <= temp_size &&
+		    memcmp(temp_dp, boot_dev, size) == 0 &&
+		    device_is_present_and_system_part(temp_dp)) {
+			efi_free_pool(simple_file_system_handle);
+			return temp_dp;
+		}
+	}
+
+	if (simple_file_system_handle)
+		efi_free_pool(simple_file_system_handle);
+
+	return NULL;
+}
+
+/**
  * find_boot_device - identify the boot device
  *
  * Identify the boot device from boot-related variables as UEFI
@@ -928,6 +1018,7 @@ static efi_status_t find_boot_device(void)
 	int i, num;
 	struct efi_simple_file_system_protocol *volume;
 	struct efi_device_path *boot_dev = NULL;
+	struct efi_device_path *full_path;
 	efi_status_t ret;
 
 	/* find active boot device in BootNext */
@@ -951,7 +1042,13 @@ static efi_status_t find_boot_device(void)
 			if (device_is_present_and_system_part(boot_dev)) {
 				goto found;
 			} else {
+				full_path = get_esp_from_boot_option_file_path(boot_dev);
 				efi_free_pool(boot_dev);
+				if (full_path) {
+					log_info("efi device path %pD %pD\n", boot_dev, full_path);
+					boot_dev = full_path;
+					goto found;
+				}
 				boot_dev = NULL;
 			}
 		}
