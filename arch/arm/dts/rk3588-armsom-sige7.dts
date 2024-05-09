@@ -8,7 +8,7 @@
 
 / {
 	model = "ArmSoM Sige7 Board";
-	compatible = "armsom,rk3588-armsom-sige7", "rockchip,rk3588";
+	compatible = "armsom,sige7", "rockchip,rk3588";
 
 	reserved-memory {
 		#address-cells = <2>;
