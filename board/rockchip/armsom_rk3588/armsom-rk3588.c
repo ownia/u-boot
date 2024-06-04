@@ -22,7 +22,7 @@ struct efi_capsule_update_info update_info = {
 
 void rockchip_capsule_update_board_setup(void)
 {
-	efi_guid_t uboot_image_type_guid = ROCKCHIP_UBOOT_IMAGE_GUID;
+	efi_guid_t uboot_image_type_guid = ARMSOM_SIGE7_UBOOT_IMAGE_GUID;
 
 	guidcpy(&fw_images[0].image_type_id, &uboot_image_type_guid);
 	fw_images[0].fw_name = u"ROCKCHIP_UBOOT";
@@ -32,7 +32,7 @@ void rockchip_capsule_update_board_setup(void)
 
 struct efi_fw_image fw_images[] = {
 	{
-		.image_type_id = ROCKCHIP_UBOOT_IMAGE_GUID,
+		.image_type_id = ARMSOM_SIGE7__UBOOT_IMAGE_GUID,
 		.fw_name = u"ROCKCHIP_UBOOT",
 		.image_index = 1,
 	}
