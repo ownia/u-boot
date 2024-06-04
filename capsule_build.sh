@@ -7,7 +7,7 @@ mkimage -f test.its tests.itb
 ./tools/mkeficapsule \
 	--private-key "CRT.key" \
 	--certificate "CRT.crt" \
-	--guid 5452a04a-462d-4433-9778-2b5259277bb3 \
+	--guid b62dbe3f-385d-4bcf-8c0f-5cd75c983b08 \
 	--index 1 \
 	"tests.itb" \
 	"capsule1.bin"
