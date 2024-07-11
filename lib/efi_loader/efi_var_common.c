@@ -40,6 +40,20 @@ static const struct efi_auth_var_name_type name_type[] = {
 static bool efi_secure_boot;
 static enum efi_secure_mode efi_secure_mode;
 
+void efi_runtime_debug(const void *data, efi_uintn_t data_size)
+{
+	static unsigned int index = 0;
+	u16 varname[] = u"efi_debug_####";
+
+	//printf("efi_runtime_debug %s\n", data);
+
+	efi_guid_t guid = efi_global_variable_guid;
+	efi_create_indexed_name(varname, sizeof(varname), "efi_debug_", index++);
+	efi_set_variable_int(varname, &guid,
+			     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+			     data_size, data, false);
+}
+
 /**
  * efi_efi_get_variable() - retrieve value of a UEFI variable
  *
@@ -63,6 +77,8 @@ efi_status_t EFIAPI efi_get_variable(u16 *variable_name,
 
 	EFI_ENTRY("\"%ls\" %pUs %p %p %p", variable_name, vendor, attributes,
 		  data_size, data);
+
+	efi_runtime_debug("get variable", 13);
 
 	ret = efi_get_variable_int(variable_name, vendor, attributes,
 				   data_size, data, NULL);
@@ -98,6 +114,8 @@ efi_status_t EFIAPI efi_set_variable(u16 *variable_name,
 	EFI_ENTRY("\"%ls\" %pUs %x %zu %p", variable_name, vendor, attributes,
 		  data_size, data);
 
+	efi_runtime_debug("set variable", 13);
+
 	/* Make sure that the EFI_VARIABLE_READ_ONLY flag is not set */
 	if (attributes & ~EFI_VARIABLE_MASK)
 		ret = EFI_INVALID_PARAMETER;
@@ -127,6 +145,8 @@ efi_status_t EFIAPI efi_get_next_variable_name(efi_uintn_t *variable_name_size,
 	efi_status_t ret;
 
 	EFI_ENTRY("%p \"%ls\" %pUs", variable_name_size, variable_name, vendor);
+
+	efi_runtime_debug("get next variable name", 23);
 
 	ret = efi_get_next_variable_name_int(variable_name_size, variable_name,
 					     vendor);
@@ -162,6 +182,18 @@ efi_status_t EFIAPI efi_query_variable_info(
 	EFI_ENTRY("%x %p %p %p", attributes, maximum_variable_storage_size,
 		  remaining_variable_storage_size, maximum_variable_size);
 
+
+	void *call0 = __builtin_return_address(0);
+	void *call1 = __builtin_return_address(1);
+	char buf0[16] = {0};
+	char buf1[16] = {0};
+	sprintf(buf0, "%p", &call0);
+	sprintf(buf1, "%p", &call1);
+
+	efi_runtime_debug("query variable info", 20);
+	efi_runtime_debug(&buf0, sizeof(buf0));
+	efi_runtime_debug(&buf1, sizeof(buf1));
+
 	ret = efi_query_variable_info_int(attributes,
 					  maximum_variable_storage_size,
 					  remaining_variable_storage_size,
@@ -175,6 +207,8 @@ efi_get_variable_runtime(u16 *variable_name, const efi_guid_t *guid,
 			 u32 *attributes, efi_uintn_t *data_size, void *data)
 {
 	efi_status_t ret;
+
+	//efi_runtime_debug("get variable runtime", 21);
 
 	ret = efi_get_variable_mem(variable_name, guid, attributes, data_size,
 				   data, NULL, EFI_VARIABLE_RUNTIME_ACCESS);
@@ -190,6 +224,8 @@ efi_status_t __efi_runtime EFIAPI
 efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
 				   u16 *variable_name, efi_guid_t *guid)
 {
+	//efi_runtime_debug("get next variable name runtime", 31);
+
 	return efi_get_next_variable_name_mem(variable_name_size, variable_name,
 					      guid, EFI_VARIABLE_RUNTIME_ACCESS);
 }

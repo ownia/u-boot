@@ -463,6 +463,8 @@ static efi_status_t __efi_runtime EFIAPI efi_query_variable_info_runtime(
 			u64 *remaining_variable_storage_size,
 			u64 *maximum_variable_size)
 {
+	//efi_runtime_debug("query variable info runtime", 28);
+
 	if (!(attributes & EFI_VARIABLE_RUNTIME_ACCESS))
 		return EFI_INVALID_PARAMETER;
 	if ((attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS |
@@ -495,6 +497,8 @@ efi_set_variable_runtime(u16 *variable_name, const efi_guid_t *vendor,
 	efi_uintn_t ret;
 	bool append, delete;
 	u64 time = 0;
+
+	//efi_runtime_debug("set variable info runtime", 26);
 
 	if (!IS_ENABLED(CONFIG_EFI_RT_VOLATILE_STORE))
 		return EFI_UNSUPPORTED;
