@@ -54,6 +54,15 @@ void efi_runtime_debug(const void *data, efi_uintn_t data_size)
 			     data_size, data, false);
 }
 
+void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size, const efi_guid_t *guid)
+{
+	u16 varname[] = u"efi_runtime";
+
+	efi_set_variable_runtime(varname, guid,
+			EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+			data_size, data);
+}
+
 /**
  * efi_efi_get_variable() - retrieve value of a UEFI variable
  *
@@ -208,7 +217,7 @@ efi_get_variable_runtime(u16 *variable_name, const efi_guid_t *guid,
 {
 	efi_status_t ret;
 
-	//efi_runtime_debug("get variable runtime", 21);
+	efi_runtime_debug_rt("get variable runtime", 21, guid);
 
 	ret = efi_get_variable_mem(variable_name, guid, attributes, data_size,
 				   data, NULL, EFI_VARIABLE_RUNTIME_ACCESS);
@@ -224,7 +233,7 @@ efi_status_t __efi_runtime EFIAPI
 efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
 				   u16 *variable_name, efi_guid_t *guid)
 {
-	//efi_runtime_debug("get next variable name runtime", 31);
+	efi_runtime_debug_rt("get next variable name runtime", 31, guid);
 
 	return efi_get_next_variable_name_mem(variable_name_size, variable_name,
 					      guid, EFI_VARIABLE_RUNTIME_ACCESS);

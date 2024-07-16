@@ -329,6 +329,11 @@ efi_status_t __efi_runtime EFIAPI
 efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
 				   u16 *variable_name, efi_guid_t *guid);
 
+efi_status_t __efi_runtime EFIAPI
+efi_set_variable_runtime(u16 *variable_name, const efi_guid_t *vendor,
+			 u32 attributes, efi_uintn_t data_size,
+			 const void *data);
+
 /**
  * efi_var_buf_update() - udpate memory buffer for variables
  *
