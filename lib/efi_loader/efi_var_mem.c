@@ -17,6 +17,21 @@
  */
 static struct efi_var_file __efi_runtime_data *efi_var_buf;
 static struct efi_var_entry __efi_runtime_data *efi_current_var;
+static efi_guid_t __efi_runtime_data efi_rt_debug_guid =
+		EFI_RUNTIME_DEBUG_VARIABLE_GUID;
+
+bool __efi_runtime efi_var_skip(const efi_guid_t *guid)
+{
+	int i;
+	bool skip = true;
+	u8 *guid1, *guid2;
+
+	for (guid1 = (u8 *)&efi_rt_debug_guid, guid2 = (u8 *)guid, i = 0;
+	     i < sizeof(efi_guid_t) && skip; ++i)
+		skip = (guid1[i] == guid2[i]);
+
+	return skip;
+}
 
 /**
  * efi_var_mem_compare() - compare GUID and name with a variable
@@ -312,6 +327,12 @@ efi_get_variable_mem(const u16 *variable_name, const efi_guid_t *vendor,
 
 	if (!variable_name || !vendor || !data_size)
 		return EFI_INVALID_PARAMETER;
+
+	/*
+	if (efi_var_skip(vendor))
+		return EFI_NOT_FOUND;
+	*/
+
 	var = efi_var_mem_find(vendor, variable_name, NULL);
 	if (!var)
 		return EFI_NOT_FOUND;
@@ -371,6 +392,11 @@ skip:
 
 	if (!var)
 		return EFI_NOT_FOUND;
+
+	/*
+	if (efi_var_skip(&var->guid))
+		return EFI_NOT_FOUND;
+	*/
 
 	for (pdata = var->name; *pdata; ++pdata)
 		;

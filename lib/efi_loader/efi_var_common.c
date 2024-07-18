@@ -25,6 +25,8 @@ struct efi_auth_var_name_type {
 
 const efi_guid_t efi_guid_image_security_database =
 		EFI_IMAGE_SECURITY_DATABASE_GUID;
+static efi_guid_t __efi_runtime_data efi_rt_debug_guid =
+		EFI_RUNTIME_DEBUG_VARIABLE_GUID;
 
 static const struct efi_auth_var_name_type name_type[] = {
 	{u"PK", &efi_global_variable_guid, EFI_AUTH_VAR_PK},
@@ -43,24 +45,40 @@ static enum efi_secure_mode efi_secure_mode;
 void efi_runtime_debug(const void *data, efi_uintn_t data_size)
 {
 	static unsigned int index = 0;
-	u16 varname[] = u"efi_debug_####";
+	u16 varname[] = u"EFIDebug####";
 
-	//printf("efi_runtime_debug %s\n", data);
-
-	efi_guid_t guid = efi_global_variable_guid;
-	efi_create_indexed_name(varname, sizeof(varname), "efi_debug_", index++);
-	efi_set_variable_int(varname, &guid,
+	efi_create_indexed_name(varname, sizeof(varname), "EFIDebug", index++);
+	efi_set_variable_int(varname, &efi_rt_debug_guid,
 			     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
 			     data_size, data, false);
 }
 
-void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size, const efi_guid_t *guid)
+void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size)
 {
-	u16 varname[] = u"efi_runtime";
+	static unsigned int __efi_runtime_data index = 0;
+	static u16 __efi_runtime_data varname[] = u"EFIRuntime0000";
+	unsigned int i = 4, j = 0;
 
-	efi_set_variable_runtime(varname, guid,
-			EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-			data_size, data);
+	j = index++;
+	while (i--) {
+		int digit = j % 16;
+
+		if (digit < 10)
+			varname[10 + i] = '0' + digit;
+		else
+			varname[10 + i] = 'A' + (digit - 10);
+		j /= 16;
+	}
+
+	if (data) {
+		efi_set_variable_runtime(varname, &efi_rt_debug_guid,
+				EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+				data_size, data);
+	} else {
+		efi_set_variable_runtime(varname, &efi_rt_debug_guid,
+				EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+				28, varname);
+	}
 }
 
 /**
@@ -217,10 +235,11 @@ efi_get_variable_runtime(u16 *variable_name, const efi_guid_t *guid,
 {
 	efi_status_t ret;
 
-	efi_runtime_debug_rt("get variable runtime", 21, guid);
-
 	ret = efi_get_variable_mem(variable_name, guid, attributes, data_size,
 				   data, NULL, EFI_VARIABLE_RUNTIME_ACCESS);
+
+	if (!efi_var_skip(guid))
+		efi_runtime_debug_rt(data, *data_size);
 
 	/* Remove EFI_VARIABLE_READ_ONLY flag */
 	if (attributes)
@@ -233,10 +252,15 @@ efi_status_t __efi_runtime EFIAPI
 efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
 				   u16 *variable_name, efi_guid_t *guid)
 {
-	efi_runtime_debug_rt("get next variable name runtime", 31, guid);
+	efi_status_t ret;
 
-	return efi_get_next_variable_name_mem(variable_name_size, variable_name,
+	ret = efi_get_next_variable_name_mem(variable_name_size, variable_name,
 					      guid, EFI_VARIABLE_RUNTIME_ACCESS);
+
+	if (!efi_var_skip(guid))
+		efi_runtime_debug_rt(variable_name, *variable_name_size);
+
+	return ret;
 }
 
 /**

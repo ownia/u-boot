@@ -351,4 +351,6 @@ efi_status_t __efi_runtime efi_var_collect_mem(struct efi_var_file *buf,
 
 u32 efi_var_entry_len(struct efi_var_entry *var);
 
+bool __efi_runtime efi_var_skip(const efi_guid_t *guid);
+
 #endif

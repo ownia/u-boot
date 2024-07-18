@@ -498,7 +498,8 @@ efi_set_variable_runtime(u16 *variable_name, const efi_guid_t *vendor,
 	bool append, delete;
 	u64 time = 0;
 
-	//efi_runtime_debug("set variable info runtime", 26);
+	if (!efi_var_skip(vendor))
+		efi_runtime_debug_rt("set variable info runtime", 26);
 
 	if (!IS_ENABLED(CONFIG_EFI_RT_VOLATILE_STORE))
 		return EFI_UNSUPPORTED;
