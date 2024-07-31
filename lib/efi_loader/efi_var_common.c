@@ -53,11 +53,15 @@ void efi_runtime_debug(const void *data, efi_uintn_t data_size)
 			     data_size, data, false);
 }
 
-void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size)
+void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size, const efi_guid_t *guid)
 {
 	static unsigned int __efi_runtime_data index = 0;
 	static u16 __efi_runtime_data varname[] = u"EFIRuntime0000";
 	unsigned int i = 4, j = 0;
+	int ret = 0;
+
+	if (efi_var_skip(guid, &efi_rt_debug_guid))
+		return;
 
 	j = index++;
 	while (i--) {
@@ -71,14 +75,17 @@ void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size)
 	}
 
 	if (data) {
-		efi_set_variable_runtime(varname, &efi_rt_debug_guid,
+		ret = efi_set_variable_runtime(varname, &efi_rt_debug_guid,
 				EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
 				data_size, data);
 	} else {
-		efi_set_variable_runtime(varname, &efi_rt_debug_guid,
+		ret = efi_set_variable_runtime(varname, &efi_rt_debug_guid,
 				EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
 				28, varname);
 	}
+
+	//if (ret != EFI_SUCCESS && ret != EFI_INVALID_PARAMETER)
+	//	memcpy("firmware", "halt", 0x01);
 }
 
 /**
@@ -238,8 +245,8 @@ efi_get_variable_runtime(u16 *variable_name, const efi_guid_t *guid,
 	ret = efi_get_variable_mem(variable_name, guid, attributes, data_size,
 				   data, NULL, EFI_VARIABLE_RUNTIME_ACCESS);
 
-	if (!efi_var_skip(guid))
-		efi_runtime_debug_rt(data, *data_size);
+	if (ret == EFI_SUCCESS)
+		efi_runtime_debug_rt(data, *data_size, guid);
 
 	/* Remove EFI_VARIABLE_READ_ONLY flag */
 	if (attributes)
@@ -257,8 +264,8 @@ efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
 	ret = efi_get_next_variable_name_mem(variable_name_size, variable_name,
 					      guid, EFI_VARIABLE_RUNTIME_ACCESS);
 
-	if (!efi_var_skip(guid))
-		efi_runtime_debug_rt(variable_name, *variable_name_size);
+	if (ret == EFI_SUCCESS)
+		efi_runtime_debug_rt(variable_name, *variable_name_size, guid);
 
 	return ret;
 }
