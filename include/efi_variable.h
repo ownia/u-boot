@@ -329,10 +329,14 @@ efi_status_t __efi_runtime EFIAPI
 efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
 				   u16 *variable_name, efi_guid_t *guid);
 
+#ifdef CONFIG_EFI_RT_DEBUG
 efi_status_t __efi_runtime EFIAPI
 efi_set_variable_runtime(u16 *variable_name, const efi_guid_t *vendor,
 			 u32 attributes, efi_uintn_t data_size,
 			 const void *data);
+
+bool __efi_runtime efi_var_skip(const efi_guid_t *guid, efi_guid_t *vendor);
+#endif
 
 /**
  * efi_var_buf_update() - udpate memory buffer for variables
@@ -350,7 +354,5 @@ efi_status_t __efi_runtime efi_var_collect_mem(struct efi_var_file *buf,
 					       u32 check_attr_mask);
 
 u32 efi_var_entry_len(struct efi_var_entry *var);
-
-bool __efi_runtime efi_var_skip(const efi_guid_t *guid, efi_guid_t *vendor);
 
 #endif

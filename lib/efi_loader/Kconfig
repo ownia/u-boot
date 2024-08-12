@@ -512,4 +512,11 @@ config EFI_HTTP_BOOT
 	  Enabling this option adds EFI HTTP Boot support. It allows to
 	  directly boot from network.
 
+config EFI_RT_DEBUG
+	bool "EFI Runtime Service Debug Feature"
+	depends on EFI_RT_VOLATILE_STORE
+	default n
+	help
+	  Enabling this option adds the EFI runtime service debug feature.
+
 endif

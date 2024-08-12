@@ -463,7 +463,7 @@ static efi_status_t __efi_runtime EFIAPI efi_query_variable_info_runtime(
 			u64 *remaining_variable_storage_size,
 			u64 *maximum_variable_size)
 {
-	//efi_runtime_debug_rt("query variable info runtime", 28);
+	// efi_runtime_debug_rt("query variable info runtime", 28);
 
 	if (!(attributes & EFI_VARIABLE_RUNTIME_ACCESS))
 		return EFI_INVALID_PARAMETER;
@@ -515,7 +515,9 @@ efi_set_variable_runtime(u16 *variable_name, const efi_guid_t *vendor,
 	if (ret != EFI_SUCCESS)
 		return ret;
 
+#ifdef CONFIG_EFI_RT_DEBUG
 	efi_runtime_debug_rt("set variable info runtime", 26, vendor);
+#endif
 
 	/* check if a variable exists */
 	var = efi_var_mem_find(vendor, variable_name, NULL);

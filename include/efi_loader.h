@@ -925,8 +925,10 @@ efi_status_t EFIAPI efi_query_variable_info(
 
 void *efi_get_var(const u16 *name, const efi_guid_t *vendor, efi_uintn_t *size);
 
+#ifdef CONFIG_EFI_RT_DEBUG
 void efi_runtime_debug(const void *data, efi_uintn_t data_size);
 void __efi_runtime efi_runtime_debug_rt(const void *data, efi_uintn_t data_size, const efi_guid_t *guid);
+#endif
 
 /*
  * See section 3.1.3 in the v2.7 UEFI spec for more details on
