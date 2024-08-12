@@ -6,10 +6,10 @@
 #ifndef __SIGE7_RK3588_H
 #define __SIGE7_RK3588_H
 
-#define ROCKCHIP_DEVICE_SETTINGS \
-		"stdout=serial,vidconsole\0" \
-		"stderr=serial,vidconsole\0"
-
 #include <configs/rk3588_common.h>
+
+#define ARMSOM_SIGE7_UBOOT_IMAGE_GUID \
+	EFI_GUID(0xb62dbe3f, 0x385d, 0x4bcf, 0x8c, 0x0f, \
+		 0x5c, 0xd7, 0x5c, 0x98, 0x3b, 0x08)
 
 #endif /* __SIGE7_RK3588_H */
