@@ -10,6 +10,8 @@
 #include <command.h>
 #include <net.h>
 #include <vsprintf.h>
+#include <asm/io.h>
+#include <asm/arch-rockchip/boot_mode.h>
 
 #ifdef CONFIG_CMD_GO
 
@@ -55,6 +57,29 @@ U_BOOT_CMD(
 );
 
 #endif
+
+static int do_reboot_brom(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
+{
+	/*
+	 * These SOC_CON1 regs needs to be cleared before a reset or the
+	 * BOOT_MODE_REG do not retain its value and it is not possible
+	 * to reset to bootrom download mode once TF-A has been started.
+	 *
+	 * TF-A blobs for RK3568 already clear SOC_CON1 for PSCI reset.
+	 * However, the TF-A blobs for RK3588 does not clear SOC_CON1.
+	 */
+	writel(0xFFFF0000, 0xFD58A004);
+	writel(BOOT_BROM_DOWNLOAD, CONFIG_ROCKCHIP_BOOT_MODE_REG);
+	do_reset(NULL, 0, 0, NULL);
+
+	return 0;
+}
+
+U_BOOT_CMD(
+	rbrom, 1, 0,	do_reboot_brom,
+	"Perform RESET of the CPU",
+	""
+);
 
 U_BOOT_CMD(
 	reset, 2, 0,	do_reset,
