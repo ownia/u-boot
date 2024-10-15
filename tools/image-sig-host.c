@@ -49,6 +49,13 @@ struct checksum_algo checksum_algos[] = {
 
 struct crypto_algo crypto_algos[] = {
 	{
+		.name = "rsa1024",
+		.key_len = RSA1024_BYTES,
+		.sign = rsa_sign,
+		.add_verify_data = rsa_add_verify_data,
+		.verify = rsa_verify,
+	},
+	{
 		.name = "rsa2048",
 		.key_len = RSA2048_BYTES,
 		.sign = rsa_sign,

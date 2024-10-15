@@ -1,0 +1,21 @@
+/dts-v1/;
+
+/ {
+     description = "Automatic U-Boot update";
+     \#address-cells = <1>;
+
+     images {
+             u-boot.itb {
+                     description = "U-Boot binary";
+                     data = /incbin/("u-boot.itb");
+                     compression = "none";
+                     type = "firmware";
+                     arch = "arm64";
+                     load = <0x0>;
+
+                     hash-1 {
+                             algo = "sha1";
+                     };
+             };
+     };
+};
