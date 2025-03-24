@@ -734,3 +734,15 @@
 	dr_mode = "host";
 	status = "okay";
 };
+
+&can1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&can1m0_pins>;
+};
+
+&can2 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&can2m0_pins>;
+};
