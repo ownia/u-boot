@@ -4,3 +4,7 @@
  */
 
 #include "rk3588-u-boot.dtsi"
+
+#if defined(CONFIG_SYSINFO_SMBIOS)
+#include "smbios_generic.dtsi"
+#endif
