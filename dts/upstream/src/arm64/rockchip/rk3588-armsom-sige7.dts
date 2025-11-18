@@ -216,12 +216,12 @@
 
 	trips {
 		package_fan0: package-fan0 {
-			temperature = <55000>;
+			temperature = <50000>;
 			hysteresis = <2000>;
 			type = "active";
 		};
 		package_fan1: package-fan1 {
-			temperature = <65000>;
+			temperature = <60000>;
 			hysteresis = <2000>;
 			type = "active";
 		};
